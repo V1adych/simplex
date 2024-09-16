@@ -1,46 +1,56 @@
 import numpy as np
 
 
-def simplex(A, b, c):
+def simplex(A, b, c, tol=1e-6):
     m, n = A.shape
 
-    tableau = np.zeros((m + 1, n + m + 1))
-    tableau[:-1, :-1] = np.hstack((A, np.eye(m)))
-    tableau[:-1, -1] = b
-    tableau[-1, :-1] = np.hstack((-c, np.zeros(m)))
+    A_eq = np.hstack([A, np.eye(m)])
+    c_eq = np.concatenate([c, np.zeros(m)])
+    B = list(range(n, n + m))
+    tableau = np.hstack([A_eq, b.reshape(-1, 1)])
+    tableau = np.vstack([tableau, np.concatenate([c_eq, [0]])])
 
-    def pivot(tableau, row, col):
-        tableau[row, :] /= tableau[row, col]
-        for r in range(tableau.shape[0]):
-            if r != row:
-                tableau[r, :] -= tableau[r, col] * tableau[row, :]
+    def pivot_col():
+        last_row = tableau[-1, :-1]
+        if np.all(last_row >= -tol):
+            return -1
+        return np.argmin(last_row)
+
+    def pivot_row(col):
+        rhs = tableau[:-1, -1]
+        lhs = tableau[:-1, col]
+        ratios = np.full_like(rhs, np.inf)
+        valid = lhs > tol
+        ratios[valid] = rhs[valid] / lhs[valid]
+        if np.all(ratios == np.inf):
+            return -1
+        return np.argmin(ratios)
 
     while True:
-        if all(tableau[-1, :-1] >= 0):
+        col = pivot_col()
+        if col == -1:
             break
+        row = pivot_row(col)
+        if row == -1:
+            raise ValueError("The problem is unbounded.")
 
-        col = np.argmin(tableau[-1, :-1])
+        tableau[row, :] /= tableau[row, col]
+        for i in range(len(tableau)):
+            if i != row:
+                tableau[i, :] -= tableau[i, col] * tableau[row, :]
 
-        if all(tableau[:-1, col] <= 0):
-            return None
+        B[row] = col
 
-        ratios = tableau[:-1, -1] / tableau[:-1, col]
-        valid_ratios = [(i, ratio) for i, ratio in enumerate(ratios) if ratio > 0]
-        row, _ = min(valid_ratios, key=lambda x: x[1])
+    x = np.zeros(n + m)
+    x[B] = tableau[:-1, -1]
 
-        pivot(tableau, row, col)
-
-    x = np.zeros(n)
-    for i in range(m):
-        if np.argmax(tableau[i, :n]) < n:
-            x[np.argmax(tableau[i, :n])] = tableau[i, -1]
-
-    return x
+    return x[:n]
 
 
 A = np.array(
     [
-        [120, 100, 150, 80, 50],
+        [130, 100, 155, 85, 50],
+        [0.004, 0.005, 0.006, 0.003, 0.004],
         [1, 0, 0, 0, 0],
         [0, 1, 0, 0, 0],
         [0, 0, 1, 0, 0],
@@ -50,8 +60,8 @@ A = np.array(
     dtype=np.float32,
 )
 
-b = np.array([200, 0.6, 0.6, 0.6, 0.2, 0.05], dtype=np.float32)
-c = np.array([200, 160, 260, 150, 400], dtype=np.float32)
-
-solution = simplex(A, b, c)
-print("Optimal solution:", solution)
+b = np.array([200, 1, 0.6, 0.6, 0.6, 0.2, 0.05], dtype=np.float32)
+c = -np.array([200, 160, 260, 150, 400], dtype=np.float32)
+x = simplex(A, b, c)
+print("Optimal solution:", x)
+print("Optimal value:", -c @ x)
