@@ -13,11 +13,22 @@ The problem is solved using two methods:
 1. **SciPy's `linprog` function**.
 2. **Custom Simplex method implementation**.
 
-### Problem Setup
+### File hierarchy
+```bash
+├── README.md
+├── LICENSE
+├── tests/
+│   └── test_simplex.py # tests for comparing results between our method and scipy
+├── .gitignore
+├── simplex.py # our implementation of simplex
+└── simplex_scipy.py # scipy implementation of simplex
+```
+
+## Problem Setup
 
 - **Objective function:**  
-   Maximize `c.T @ x`  
-   where `x` is the amount of each ingredient, and `c` is the vector of the nutritious value per kilogram.
+   Maximize $c^\top x$  with constraint $Ax \leq b$
+   where $x$ is the amount of each ingredient, $c$ is the vector of the nutritious value per kilogram, $A$ is constraint coefficients, and $b$ is constraint upper bounds.
   
 - **Constraints:**  
    The system is constrained by the maximum allowed weights of ingredients, their costs, and fat content proportions.
