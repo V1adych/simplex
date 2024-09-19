@@ -25,13 +25,14 @@ The problem is solved using two methods:
 ```
 
 ## Problem Setup
+- **Problem statement:**  
+   Maximize $c^\top x$  with constraint $Ax \leq b$ where $x$ is the amount of each ingredient, $c$ is the vector of the nutritious value per kilogram, $A$ is constraint coefficients, and $b$ is constraint upper bounds.
 
 - **Objective function:**  
-   Maximize $c^\top x$  with constraint $Ax \leq b$
-   where $x$ is the amount of each ingredient, $c$ is the vector of the nutritious value per kilogram, $A$ is constraint coefficients, and $b$ is constraint upper bounds.
+   Maximize nutritious value of the salad measured in kilocalories (kcal).
   
 - **Constraints:**  
-   The system is constrained by the maximum allowed weights of ingredients, their costs, and fat content proportions.
+   The system is constrained by the maximum allowed weights of ingredients (kg), their costs (rub), and fat content proportions (kg).
 
 ### Input Matrix
 
