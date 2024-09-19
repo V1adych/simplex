@@ -1,7 +1,25 @@
 import numpy as np
+from typing import Tuple
 
 
-def simplex(A, b, c, tol=1e-6):
+def simplex(
+    A: np.ndarray, b: np.ndarray, c: np.ndarray, tol: float = 1e-6
+) -> Tuple[bool, np.ndarray, float]:
+    """
+    Solves a linear programming problem using the simplex method.
+
+    Args:
+    A: A numpy array representing the coefficients of the constraints.
+    b: A numpy array representing the right-hand side of the constraints.
+    c: A numpy array representing the coefficients of the objective function.
+    tol: A tolerance value for the simplex method.
+
+    Returns:
+    A tuple containing three elements:
+    - A boolean value indicating whether the simplex method was successful.
+    - A numpy array representing the solution to the linear programming problem.
+    - The value of the objective function at the solution.
+    """
     m, n = A.shape
 
     A_eq = np.hstack([A, np.eye(m)])
@@ -32,7 +50,7 @@ def simplex(A, b, c, tol=1e-6):
             break
         row = pivot_row(col)
         if row == -1:
-            raise ValueError("The problem is unbounded.")
+            return False, None, None
 
         tableau[row, :] /= tableau[row, col]
         for i in range(len(tableau)):
@@ -44,9 +62,7 @@ def simplex(A, b, c, tol=1e-6):
     x = np.zeros(n + m)
     x[B] = tableau[:-1, -1]
 
-    return x[:n]
-
-
+    return True, x[:n], c @ x[:n]
 
 
 def main():
@@ -64,9 +80,11 @@ def main():
     )
     b = np.array([200, 1, 0.6, 0.6, 0.6, 0.2, 0.05], dtype=np.float32)
     c = -np.array([200, 160, 260, 150, 400], dtype=np.float32)
-    x = simplex(A, b, c)
+    state, x, f = simplex(A, b, c)
+    print("Solver state:", "solved" if state else "not solved")
     print("Optimal solution:", x)
-    print("Optimal value:", -c @ x)
+    print("Optimal value:", f)
+
 
 if __name__ == "__main__":
     main()
