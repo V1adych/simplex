@@ -21,7 +21,7 @@ def test_simplex_base():
         ],
         dtype=np.float32,
     )
-    b = np.array([200, 1, 0.6, 0.6, 0.6, 0.2, 0.05], dtype=np.float32)
+    b = np.array([200, 0.01, 0.6, 0.6, 0.6, 0.2, 0.05], dtype=np.float32)
     c = -np.array([200, 160, 260, 150, 400], dtype=np.float32)
 
     _, x_result, _ = simplex(A, b, c)

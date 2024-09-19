@@ -37,31 +37,58 @@ The problem is solved using two methods:
 ### Constraints
 The system aims to satisfy the following:
 1. The total cost of the ingredients should not exceed 200 rubles.
-2. The total fat content should be below a specified limit.
-3. Each ingredient has a maximum allowable weight.
+2. The total fat content should be below 10 grams.
+3. Each ingredient has a maximum allowable weight (to avoid cooking Onion Frenzy).
 
 ## Dependencies
 
 - Python 3.x
 - NumPy
 - SciPy
+- PyTest (optional) 
 
 You can install the required dependencies using pip:
 
 ```bash
-pip install numpy scipy
+pip install numpy scipy pytest
 ```
 
 ## Usage
 
-### SciPy Linear Programming Solver
-
-The first approach utilizes `SciPy`'s built-in `linprog` function for solving the linear programming problem.
+To run tests for comparing `scipy` implementation with ours, run:
+```bash
+pytest
+```
+To get result of our implementation of simplex method:
+```bash
+python simplex.py
+```
+To view `scipy` results:
+```bash
+python simplex_scipy.py
+```
 
 ## Results
 
-The method outputs the optimal quantities of ingredients that maximize the nutritious value while satisfying the constraints. For example, with the given parameters:
+Both our implementation and `scipy` show same optimal solution of the LP problem:
 
+- **Optimal solution (x)**
+
+| Ingredient    | Resulting x (kg)|
+| ------------- | --------------- |
+| Tomato        | 0.2115          |
+| Cucumber      | 0.6             |
+| Bell Pepper   | 0.6             |
+| Lettuce Leaf  | 0.2             |
+| Onion         | 0.05            |
+
+- **Target function $(c^\top x)$**
+
+| Optimal value (kcal) |
+| -------------------- |
+| 344.4                |
+
+Congratulations! We have found most nutritious salad receipt for 200 rub budget!
 ## Authors
 
 - Nikita Zagainov, Ilyas Galiev, Arthur Babkin, Nikita Menshikov
