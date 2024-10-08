@@ -28,27 +28,11 @@ def simplex(
     tableau = np.hstack([A_eq, b.reshape(-1, 1)])
     tableau = np.vstack([tableau, np.concatenate([c_eq, [0]])])
 
-    def pivot_col():
-        last_row = tableau[-1, :-1]
-        if np.all(last_row >= -tol):
-            return -1
-        return np.argmin(last_row)
-
-    def pivot_row(col):
-        rhs = tableau[:-1, -1]
-        lhs = tableau[:-1, col]
-        ratios = np.full_like(rhs, np.inf)
-        valid = lhs > tol
-        ratios[valid] = rhs[valid] / lhs[valid]
-        if np.all(ratios == np.inf):
-            return -1
-        return np.argmin(ratios)
-
     while True:
-        col = pivot_col()
+        col = pivot_col(tableau, tol)
         if col == -1:
             break
-        row = pivot_row(col)
+        row = pivot_row(tableau, tol, col)
         if row == -1:
             return False, None, None
 
@@ -63,6 +47,24 @@ def simplex(
     x[B] = tableau[:-1, -1]
 
     return True, x[:n], c @ x[:n]
+
+
+def pivot_col(tableau: np.ndarray, tol: float) -> int:
+    last_row = tableau[-1, :-1]
+    if np.all(last_row >= -tol):
+        return -1
+    return np.argmin(last_row)
+
+
+def pivot_row(tableau: np.ndarray, tol: float, col: int) -> int:
+    rhs = tableau[:-1, -1]
+    lhs = tableau[:-1, col]
+    ratios = np.full_like(rhs, np.inf)
+    valid = lhs > tol
+    ratios[valid] = rhs[valid] / lhs[valid]
+    if np.all(ratios == np.inf):
+        return -1
+    return np.argmin(ratios)
 
 
 def main():
